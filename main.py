@@ -3,16 +3,25 @@ from OpenGL.GLU import *
 from OpenGL.GLUT import *
 import pygame
 
-WINDOW_WIDHT = 1280
+WINDOW_WIDTH = 1280
 WINDOW_HEIGHT = 720
+
+CAMERA_POSITION = [0.0, 0.0, 5.0]
+CAMERA_ROTATION = [0.0, 0.0, 0.0]
 
 def init():
     glClearColor(0.0, 0.0, 0.0, 1.0)
 
 def display():
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
-    glEnable(GL_DEPTH_TEST)
-    draw_triangle()
+    # glEnable(GL_DEPTH_TEST)
+    glLoadIdentity()
+    gluLookAt(CAMERA_POSITION[0], CAMERA_POSITION[1], CAMERA_POSITION[2],
+              0.0, 0.0, 0.0,
+              0.0, 1.0, 0.0)
+
+    # Renderiza a cena aqui
+
     glutSwapBuffers()
 
 def idle_display():
@@ -23,14 +32,16 @@ def reshape(w, h):
 
 def keyboard_handle(key, x, y):
 
-    if key == "w":
-        pass
-    if key == "a":
-        pass
-    if key == "s":
-        pass
-    if key == "d":
-        pass
+    axis = 0.1
+
+    if key == GLUT_KEY_UP:
+        CAMERA_POSITION[2] -= axis
+    if key == GLUT_KEY_DOWN:
+        CAMERA_POSITION[2] += axis
+    if key == GLUT_KEY_LEFT:
+        CAMERA_POSITION[0] -= axis
+    if key == GLUT_KEY_RIGHT:
+        CAMERA_POSITION[0] += axis
 
 def main():
     glutInit()
@@ -44,9 +55,9 @@ def main():
     glutDisplayFunc(display)
     glutIdleFunc(idle_display)
     glutReshapeFunc(reshape)
-    glutKeyboardFunc(keyboard_handle)
+    glutSpecialFunc(keyboard_handle)
 
     glutMainLoop()
 
-if __name__ == "__main__":
-    main()
+#if __name__ == "__main__":
+#    main()
