@@ -1,63 +1,101 @@
+# Basic OBJ file viewer. needs objloader from:
+#  http://www.pygame.org/wiki/OBJFileLoader
+# LMB + move: rotate
+# RMB + move: pan
+# Scroll wheel: zoom in/out
+import sys, pygame
+from pygame.locals import *
+from pygame.constants import *
 from OpenGL.GL import *
 from OpenGL.GLU import *
-from OpenGL.GLUT import *
-import pygame
 
-WINDOW_WIDTH = 1280
-WINDOW_HEIGHT = 720
+# IMPORT OBJECT LOADER
+from OBJLoader import *
 
-CAMERA_POSITION = [0.0, 0.0, 5.0]
-CAMERA_ROTATION = [0.0, 0.0, 0.0]
+pygame.init()
+pygame.display.set_caption('sala de controle')
+viewport = (800,600)
+hx = viewport[0]/2
+hy = viewport[1]/2
+srf = pygame.display.set_mode(viewport, OPENGL | DOUBLEBUF)
+LIGHT_SIZE = 7
+LIGHT_COUNT = 3
 
-def init():
-    glClearColor(0.0, 0.0, 0.0, 1.0)
+glLightfv(GL_LIGHT0, GL_POSITION,  (-40, 200, 100, 100.0))
+glLightfv(GL_LIGHT0, GL_AMBIENT, (1.2, 1.2, 1.2, 100.0))
+glLightfv(GL_LIGHT0, GL_DIFFUSE, (30.5, 30.5, 30.5, 100.0))
+glEnable(GL_LIGHT0)
+glEnable(GL_LIGHTING)
+glEnable(GL_COLOR_MATERIAL)
+glEnable(GL_DEPTH_TEST)
+glShadeModel(GL_SMOOTH)           # most obj files expect to be smooth-shaded
 
-def display():
+rx, ry= (0,0)
+tx, ty = (0,0)
+zpos = 0
+rotate = move = False
+
+# LOAD OBJECT AFTER PYGAME INIT
+obj = OBJ('./modelagem.obj', swapyz=True)
+
+clock = pygame.time.Clock()
+
+glMatrixMode(GL_PROJECTION)
+glLoadIdentity()
+width, height = viewport
+gluPerspective(90.0, width/float(height), 1, 100.0)
+gluLookAt(rx, ry, zpos, 0, 0, -5, 0, 1, 0)
+glEnable(GL_DEPTH_TEST)
+glMatrixMode(GL_MODELVIEW)
+
+
+
+while 1:
+    clock.tick(30)
+    glEnable(GL_TEXTURE_3D)
+    pressed_keyboard = pygame.key.get_pressed()
+    for e in pygame.event.get():
+        if e.type == QUIT:
+            sys.exit()
+        elif e.type == KEYDOWN and e.key == K_ESCAPE:
+            sys.exit()
+        elif e.type == MOUSEBUTTONDOWN: #Enable mouse operations
+            if e.button == 4: zpos = max(1, zpos-1)
+            elif e.button == 5: zpos += 1
+            elif e.button == 1: rotate = True
+            elif e.button == 3: move = True
+        elif e.type == MOUSEBUTTONUP:
+            if e.button == 1: rotate = False
+            elif e.button == 3: move = False
+        elif e.type == MOUSEMOTION:
+            i, j = e.rel
+            if rotate:
+                rx += i
+                ry += j
+            if move:
+                tx += i
+                ty -= j
+        if e.type == pygame.KEYDOWN: #Enable keyborads operations
+            if e.key == pygame.K_d:
+                rx +=10
+                zpos += 10
+            if e.key == pygame.K_a:
+                rx -= 10
+                zpos -= 10
+            if e.key == pygame.K_w:
+                ry += 10
+            if e.key == pygame.K_s:
+                ry -= 10
+
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
-    # glEnable(GL_DEPTH_TEST)
     glLoadIdentity()
-    gluLookAt(CAMERA_POSITION[0], CAMERA_POSITION[1], CAMERA_POSITION[2],
-              0.0, 0.0, 0.0,
-              0.0, 1.0, 0.0)
 
-    # Renderiza a cena aqui
+    # RENDER OBJECT
+    glTranslate(tx/50., ty/50., -zpos)
+    glRotate(ry, 1, 0, 0)
+    glRotate(rx, 0, 1, 0)
+    glCallList(obj.gl_list)
 
-    glutSwapBuffers()
 
-def idle_display():
-    glutPostRedisplay()
 
-def reshape(w, h):
-    pass
-
-def keyboard_handle(key, x, y):
-
-    axis = 0.1
-
-    if key == GLUT_KEY_UP:
-        CAMERA_POSITION[2] -= axis
-    if key == GLUT_KEY_DOWN:
-        CAMERA_POSITION[2] += axis
-    if key == GLUT_KEY_LEFT:
-        CAMERA_POSITION[0] -= axis
-    if key == GLUT_KEY_RIGHT:
-        CAMERA_POSITION[0] += axis
-
-def main():
-    glutInit()
-    glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH)
-    glutInitWindowSize(WINDOW_WIDTH, WINDOW_HEIGHT)
-    glutInitWindowPosition(0, 0)
-    window = glutCreateWindow("Sistemas de Controle")
-
-    init()
-
-    glutDisplayFunc(display)
-    glutIdleFunc(idle_display)
-    glutReshapeFunc(reshape)
-    glutSpecialFunc(keyboard_handle)
-
-    glutMainLoop()
-
-#if __name__ == "__main__":
-#    main()
+    pygame.display.flip()
