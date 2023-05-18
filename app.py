@@ -1,10 +1,12 @@
 import pygame as pg
+import sys
 from OpenGL.GL import *
+from objParser import *
 
 WINDOW_WIDTH = 1280
 WINDOW_HEIGHT = 720
 MATERIALS_FILEPATH = ' '
-OBJ_FILEPATH = ' '
+OBJ_FILEPATH = 'modelagem.obj'
 
 class App:
 
@@ -28,6 +30,7 @@ class App:
                     is_running = False
             
             glClear(GL_COLOR_BUFFER_BIT)
+            obj = OBJparser(sys.argv[1])
             pg.display.flip()
         
         self.clock.tick(60)

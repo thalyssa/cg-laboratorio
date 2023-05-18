@@ -3,11 +3,6 @@
 from OpenGL.GL import *
 import os
 
-def MTLparser(filename: str):
-
-    with open(filename, 'r') as file:
-        pass
-
 def OBJparser(self, filename: str) -> list[float]:
 
     vertices = []
@@ -82,3 +77,8 @@ def makeCorner(self, corner_data: str,
         vertices.append(element)
     for element in normals[int(corner_triplet[2]) - 1]:
         vertices.append(element)
+
+def MTLparser(filename: str):
+
+    with open(filename, 'r') as file:
+        pass
