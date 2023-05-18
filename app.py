@@ -3,6 +3,8 @@ from OpenGL.GL import *
 
 WINDOW_WIDTH = 1280
 WINDOW_HEIGHT = 720
+MATERIALS_FILEPATH = ' '
+OBJ_FILEPATH = ' '
 
 class App:
 

@@ -10,7 +10,7 @@ Repositório do primeiro projeto da disciplina de Computação Gráfica.
 ### (Essa parte sai quando acabarmos o projeto)
 
 - [ ] Navegação usando teclado
-- [ ] 5 objetos do lab
+- [ x ] 5 objetos do lab
 - [ ] Abrir e fechar de janela pelo teclado
 - [ ] Abrir e fechar de porta pelo teclado
 - [ ] 2 ventiladores de teto rotacionando em baixa velocidade
